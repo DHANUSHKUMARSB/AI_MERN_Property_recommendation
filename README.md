@@ -1,35 +1,39 @@
 # 🧠 AI House Property Recommendation System (RAG-based)
 
-A production-ready MERN stack application with AI-powered Retrieval-Augmented Generation (RAG) using LangChain, ChromaDB, and HuggingFace APIs.
+A production-ready MERN stack application with AI-powered Retrieval-Augmented Generation (RAG) using OpenRouter, HuggingFace embeddings, and ChromaDB.
 
 ## 🎯 Features
 
 - **CSV Upload**: Upload property data in CSV format for storage and retrieval
-- **AI Data Generation**: Generate synthetic property listings using HuggingFace LLM
+- **AI Data Generation**: Generate synthetic property listings using OpenRouter AI
 - **Vector Storage**: Store property embeddings in ChromaDB for semantic search
 - **Natural Language Query**: Query properties using natural language
-- **RAG Pipeline**: Retrieve relevant properties and generate AI-powered recommendations
-- **Smart Recommendations**: Get persuasive property recommendations based on your requirements
+- **RAG Pipeline**: Retrieve relevant properties using vector similarity search
+- **Smart Recommendations**: Get property recommendations based on your requirements
 
 ## 🧱 Tech Stack
 
 ### Frontend
+
 - React.js (Vite)
 - Tailwind CSS
 - Axios
 
 ### Backend
+
 - Node.js
 - Express.js
 - Multer (CSV upload)
 - dotenv
 
 ### AI Layer
-- LangChain (JS version)
-- HuggingFace Inference API (LLM + embeddings)
+
+- **OpenRouter API**: AI generation for property data
+- **HuggingFace API**: Vector embeddings (sentence-transformers/all-MiniLM-L6-v2)
 
 ### Vector Database
-- ChromaDB (local persistent storage)
+
+- **ChromaDB**: Vector storage and similarity search (local or cloud)
 
 ## 📁 Project Structure
 
@@ -88,12 +92,31 @@ root/
 
 - Node.js (v18 or higher)
 - npm or yarn
-- HuggingFace API Key
-- ChromaDB running on localhost:8000
+- OpenRouter API Key (for AI generation)
+- HuggingFace API Key (for embeddings)
+- ChromaDB (optional - will use local storage if not configured)
 
-### Step 1: Install ChromaDB
+### Step 1: Configure Environment Variables
 
-ChromaDB is required for vector storage. Install and run it:
+Edit `server/.env` and add your API keys:
+
+```env
+PORT=5000
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+HF_API_KEY=your_huggingface_api_key_here
+```
+
+To get API keys:
+
+1. **OpenRouter**: Go to [https://openrouter.ai/keys](https://openrouter.ai/keys)
+2. **HuggingFace**: Go to [https://huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
+3. Copy and paste them into the `.env` file
+
+### Step 2: Install ChromaDB (Optional)
+
+ChromaDB is used for vector storage. It will use local storage by default.
+
+For local ChromaDB (optional):
 
 ```bash
 # Using pip
@@ -103,25 +126,13 @@ pip install chromadb
 chroma-server --host localhost --port 8000
 ```
 
-Or using Docker:
-
-```bash
-docker run -p 8000:8000 chromadb/chroma
-```
-
-### Step 2: Configure Environment Variables
-
-Edit `server/.env` and add your HuggingFace API Key:
+For ChromaDB Cloud (recommended for production):
 
 ```env
-PORT=5000
-HF_API_KEY=your_huggingface_api_key_here
+# Add to server/.env
+CHROMA_HOST=your-chroma-host
+CHROMA_API_KEY=your-chroma-api-key
 ```
-
-To get a HuggingFace API Key:
-1. Go to [https://huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
-2. Create a new token
-3. Copy and paste it into the `.env` file
 
 ### Step 3: Install Backend Dependencies
 
@@ -162,17 +173,17 @@ The frontend will start on `http://localhost:3000`
 1. Click "Upload CSV" section
 2. Select a CSV file with the following format:
    ```csv
-   area_sqft,price,location,description
-   1500,250000,Los Angeles CA,Spacious 2-bedroom apartment
-   2000,450000,Miami FL,Beautiful 3-bedroom house near beach
+   area_sqft,price,bedrooms,bathrooms,location,description
+   1500,250000,2,2,Los Angeles CA,Spacious 2-bedroom apartment
+   2000,450000,3,2,Miami FL,Beautiful 3-bedroom house near beach
    ```
 3. Click "Upload CSV"
 
 ### Option 2: Generate AI Data
 
 1. Click "Generate Properties" button
-2. The system will generate 20 realistic property listings using HuggingFace AI
-3. Data will be automatically stored in ChromaDB
+2. The system will generate 20 realistic property listings using OpenRouter AI
+3. Data will be automatically stored in ChromaDB with vector embeddings
 
 ### Query Properties
 
@@ -206,14 +217,21 @@ A sample CSV file (`sample_properties.csv`) is provided for testing:
 ### ChromaDB Connection Error
 
 Make sure ChromaDB is running:
+
 ```bash
 # Check if ChromaDB is running
 curl http://localhost:8000
 ```
 
-### HuggingFace API Error
+### OpenRouter API Error
 
 - Verify your API key in `server/.env`
+- Ensure you have sufficient API credits
+- Check your internet connection
+
+### HuggingFace API Error
+
+- Verify your HF_API_KEY in `server/.env`
 - Ensure you have sufficient API credits
 - Check your internet connection
 
@@ -226,15 +244,19 @@ curl http://localhost:8000
 ## 📝 CSV Format
 
 Your CSV file must have these columns:
+
 - `area_sqft`: Property area in square feet (number)
 - `price`: Property price (number, no currency symbol)
+- `bedrooms`: Number of bedrooms (number)
+- `bathrooms`: Number of bathrooms (number)
 - `location`: Property location (string)
 - `description`: Property description (string)
 
 Example:
+
 ```csv
-area_sqft,price,location,description
-1500,250000,Los Angeles CA,Spacious 2-bedroom apartment with modern kitchen
+area_sqft,price,bedrooms,bathrooms,location,description
+1500,250000,2,2,Los Angeles CA,Spacious 2-bedroom apartment with modern kitchen
 ```
 
 ## 🔒 Security Notes
@@ -265,7 +287,7 @@ Feel free to submit issues and enhancement requests!
 
 ## 🙏 Acknowledgments
 
-- LangChain for the RAG framework
-- HuggingFace for AI models and embeddings
-- ChromaDB for vector storage
-- React and Tailwind CSS for the frontend
+- **OpenRouter** for AI generation API
+- **HuggingFace** for vector embeddings (sentence-transformers)
+- **ChromaDB** for vector storage and similarity search
+- **React** and **Tailwind CSS** for the frontend
