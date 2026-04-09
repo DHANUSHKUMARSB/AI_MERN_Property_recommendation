@@ -9,7 +9,7 @@ export const addProperties = async (newProperties) => {
     newProperties.forEach((p) => {
       properties.push({
         ...p,
-        document: `Area: ${p.area_sqft} sqft, Price: $${p.price}, Location: ${p.location}, Description: ${p.description}`,
+        document: `Area: ${p.area_sqft} sqft, Price: $${p.price}, Bedrooms: ${p.bedrooms}, Bathrooms: ${p.bathrooms}, Location: ${p.location}, Description: ${p.description}`,
       });
     });
 
