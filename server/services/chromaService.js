@@ -22,9 +22,56 @@ export const addProperties = async (newProperties) => {
 
 export const searchProperties = async (query, nResults = 5) => {
   try {
-    // Simple text-based matching
+    // Extract bedroom and bathroom requirements from query
+    const bedroomMatch = query.match(/(\d+)\s*bedroom/i);
+    const bathroomMatch = query.match(/(\d+)\s*bathroom/i);
+    const targetBedrooms = bedroomMatch ? parseInt(bedroomMatch[1]) : null;
+    const targetBathrooms = bathroomMatch ? parseInt(bathroomMatch[1]) : null;
+
+    // Filter properties based on requirements
+    const filteredProperties = properties.filter((p) => {
+      let matches = true;
+
+      if (targetBedrooms !== null) {
+        matches = matches && p.bedrooms === targetBedrooms;
+      }
+
+      if (targetBathrooms !== null) {
+        matches = matches && p.bathrooms === targetBathrooms;
+      }
+
+      return matches;
+    });
+
+    // If no exact matches, try close matches (within 1)
+    let searchResults = filteredProperties;
+    if (
+      searchResults.length === 0 &&
+      (targetBedrooms !== null || targetBathrooms !== null)
+    ) {
+      searchResults = properties.filter((p) => {
+        let matches = true;
+
+        if (targetBedrooms !== null) {
+          matches = matches && Math.abs(p.bedrooms - targetBedrooms) <= 1;
+        }
+
+        if (targetBathrooms !== null) {
+          matches = matches && Math.abs(p.bathrooms - targetBathrooms) <= 1;
+        }
+
+        return matches;
+      });
+    }
+
+    // If still no matches, use all properties
+    if (searchResults.length === 0) {
+      searchResults = properties;
+    }
+
+    // Simple text-based matching on filtered results
     const queryLower = query.toLowerCase();
-    const scores = properties.map((p) => {
+    const scores = searchResults.map((p) => {
       const text = p.document.toLowerCase();
       let score = 0;
 
